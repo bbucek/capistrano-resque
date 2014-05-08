@@ -48,6 +48,12 @@ for each queue:
 set :workers, { "archive" => 1, "mailing" => 3, "search_index, cache_warming" => 1 }
 ```
 
+If for some reason tasks `resque:start` and `resque:scheduler:start` do not work then try to add small delay ex:
+
+```
+set :resque_background_delay, 3     # Default is nil
+```
+
 The above will start five workers in total:
 
  * one listening on the `archive` queue
@@ -87,7 +93,6 @@ add the following line to your `deploy.rb`:
 ```
 after "deploy:restart", "resque:restart"
 ```
-
 ### Logging
 
 Backgrounding and logging are current sticking points. I'm using the HEAD of resque's 1-x-stable branch for the 0.0.8 release because it has some new logging functions not yet slated for a resque release.
@@ -107,16 +112,6 @@ Resque.logger = Logger.new("new_resque_log_file")
 ...somewhere sensible, such as in your resque.rake, to achieve logging.
 
 The chatter on: https://github.com/defunkt/resque/pull/450 gives more information. If using HEAD of this resque branch doesn't work for you, then pin to v0.0.7 of this project.
-
-### Redirecting output
-
-Due to issues in the way Resque 1.x handles background processes, we automatically redirect stderr and stdout to `/dev/null`.
-
-If you'd like to capture this output instead, just specify a log file:
-
-```ruby
-set :resque_log_file, "log/resque.log"
-```
 
 ### Limitations
 
